@@ -1,17 +1,11 @@
 cmake_minimum_required(VERSION 3.21)
 
-# 
-# Set the project name and version
-# 
-project(CoolProject VERSION 1.0)
+project(misc-c VERSION 1.0)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED True)
 set(CMAKE_C_CLANG_TIDY clang-tidy)
 
-# 
-# Compiler options
-# 
 add_compile_options(
   -Wall
   -Wextra
@@ -32,21 +26,11 @@ add_link_options(
   -pthread $<$<CONFIG:ASAN>:-fsanitize=address>
   $<$<CONFIG:UBSAN>:-fsanitize=undefined> $<$<CONFIG:TSAN>:-fsanitize=thread>)
 
-# 
 # Add `DEBUG` symbol when not in release mode
-# 
 add_compile_definitions($<$<NOT:$<CONFIG:RELEASE>>:DEBUG>)
 
 # 
-# Build Libraries
-# 
-add_subdirectory(src)
-
-# 
-# Build the Executable
-# 
-add_executable(main apps/main.c)
-target_link_libraries(main PUBLIC modern_lib)
-
 # Moore Finite State Machine
+# 
 add_executable(fst src/finite-state-machine/fst.c)
+# target_link_libraries(fst PUBLIC somelib)
