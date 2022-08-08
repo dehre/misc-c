@@ -47,3 +47,6 @@ add_subdirectory(src)
 # 
 add_executable(main apps/main.c)
 target_link_libraries(main PUBLIC modern_lib)
+
+# Moore Finite State Machine
+add_executable(fst src/finite-state-machine/fst.c)
