@@ -20,7 +20,7 @@ struct State
 #define PedsGreen (&(States[2]))
 #define PedsYellow (&(States[3]))
 
-static const struct State States[] = {
+const struct State States[] = {
     /* CarsGreen */
     {.cars_out = GREEN_LIGHT,
      .peds_out = RED_LIGHT,

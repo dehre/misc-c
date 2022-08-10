@@ -11,15 +11,15 @@
 //==================================================================================================
 
 #define FIFO_SIZE 4
-static int FIFO[FIFO_SIZE];
-static int *PutPtr;
-static int *GetPtr;
+int FIFO[FIFO_SIZE];
+int *PutPtr;
+int *GetPtr;
 
-static pthread_mutex_t FIFOMutex;
-static sem_t *FIFOCurrentSize;
-static sem_t *FIFORoomLeft;
+pthread_mutex_t FIFOMutex;
+sem_t *FIFOCurrentSize;
+sem_t *FIFORoomLeft;
 
-static void FIFO_Init(void)
+void FIFO_Init(void)
 {
     PutPtr = GetPtr = &(FIFO[0]);
     Pthread_mutex_init(&FIFOMutex);
@@ -27,7 +27,7 @@ static void FIFO_Init(void)
     Sem_init(FIFORoomLeft, FIFO_SIZE);
 }
 
-static void FIFO_Put(int data)
+void FIFO_Put(int data)
 {
     Sem_wait(FIFORoomLeft);
     Pthread_mutex_lock(&FIFOMutex);
@@ -43,7 +43,7 @@ static void FIFO_Put(int data)
     Sem_post(FIFOCurrentSize);
 }
 
-static int FIFO_Get(void)
+int FIFO_Get(void)
 {
     Sem_wait(FIFOCurrentSize);
     Pthread_mutex_lock(&FIFOMutex);
@@ -60,7 +60,7 @@ static int FIFO_Get(void)
     return data;
 }
 
-static void FIFO_Destroy(void)
+void FIFO_Destroy(void)
 {
     Pthread_mutex_destroy(&FIFOMutex);
     Sem_destroy(FIFOCurrentSize);
@@ -83,7 +83,7 @@ static void FIFO_Destroy(void)
 #pragma clang diagnostic ignored "-Wvoid-pointer-to-int-cast"
 #endif
 
-static void *producer(void *arg)
+void *producer(void *arg)
 {
     int producer_id = (int)arg;
     int data = rand() % 100;
@@ -92,7 +92,7 @@ static void *producer(void *arg)
     return NULL;
 }
 
-static void *consumer(void *arg)
+void *consumer(void *arg)
 {
     int consumer_id = (int)arg;
     int data = FIFO_Get();
