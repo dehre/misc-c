@@ -4,4 +4,5 @@ Checks: "
     clang-analyzer-*,
     misc-*,
     readability-*,
-    -readability-magic-numbers"
+    -readability-magic-numbers,
+    -clang-analyzer-security.insecureAPI.rand"

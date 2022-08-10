@@ -34,3 +34,8 @@ add_compile_definitions($<$<NOT:$<CONFIG:RELEASE>>:DEBUG>)
 # 
 add_executable(fst src/finite-state-machine/fst.c)
 # target_link_libraries(fst PUBLIC somelib)
+
+# 
+# Multi-Producer Multi-Consumer FIFO Queue
+# 
+add_executable(fifo-mpmc src/fifo-multi-producer-multi-consumer/fifo-mpmc.c)
