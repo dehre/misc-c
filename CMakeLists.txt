@@ -39,3 +39,4 @@ add_executable(fst src/finite-state-machine/fst.c)
 # Multi-Producer Multi-Consumer FIFO Queue
 # 
 add_executable(fifo-mpmc src/fifo-multi-producer-multi-consumer/fifo-mpmc.c)
+target_include_directories(fifo-mpmc PRIVATE src/include)
