@@ -1,6 +1,5 @@
 #include "common.h"
 #include "common_threads.h"
-#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,9 +16,7 @@ int *PutPtr;
 int *GetPtr;
 
 pthread_mutex_t FIFOMutex;
-sem_t *FIFOCurrentSize;
-/* In MacOS the fn `sem_getvalue` is deprecated, so we have to keep track of the semaphore's value on our own */
-atomic_size_t FIFOCurrentSize_val;
+semaphore_t *FIFOCurrentSize;
 
 typedef enum [[nodiscard]]
 {
@@ -32,12 +29,11 @@ void FIFO_Init(void)
     PutPtr = GetPtr = &(FIFO[0]);
     Pthread_mutex_init(&FIFOMutex);
     Sem_init(FIFOCurrentSize, 0);
-    FIFOCurrentSize_val = 0;
 }
 
 FIFO_Rc FIFO_Put(int data)
 {
-    if (FIFOCurrentSize_val == FIFO_SIZE)
+    if (Sem_getvalue(FIFOCurrentSize) == FIFO_SIZE)
     {
         return FIFO_FAIL;
     }
@@ -49,7 +45,6 @@ FIFO_Rc FIFO_Put(int data)
         PutPtr = &(FIFO[0]);
     }
 
-    FIFOCurrentSize_val++;
     Sem_post(FIFOCurrentSize);
     return FIFO_SUCCESS;
 }
@@ -57,7 +52,6 @@ FIFO_Rc FIFO_Put(int data)
 int FIFO_Get(void)
 {
     Sem_wait(FIFOCurrentSize);
-    FIFOCurrentSize_val--;
     Pthread_mutex_lock(&FIFOMutex);
 
     int data = *GetPtr;

@@ -16,8 +16,8 @@ int *PutPtr;
 int *GetPtr;
 
 pthread_mutex_t FIFOMutex;
-sem_t *FIFOCurrentSize;
-sem_t *FIFORoomLeft;
+semaphore_t *FIFOCurrentSize;
+semaphore_t *FIFORoomLeft;
 
 void FIFO_Init(void)
 {
