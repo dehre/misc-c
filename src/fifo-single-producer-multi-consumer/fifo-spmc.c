@@ -140,7 +140,7 @@ int main(void)
     }
 
     Pthread_join(producer_thread, NULL);
-    sleep(1); /* Ideally consumers would run indefinitely */
+    sleep(1); /* Wait for consumers to get all the data */
     FIFO_Destroy();
     return 0;
 }

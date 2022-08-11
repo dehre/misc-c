@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define THREADS_COUNT 8
+#define THREADS_COUNT 3
 
 //==================================================================================================
 // FIFO QUEUE
@@ -86,17 +86,23 @@ void FIFO_Destroy(void)
 void *producer(void *arg)
 {
     int producer_id = (int)arg;
-    int data = rand() % 100;
-    printf("Producer %d: put %d\n", producer_id, data);
-    FIFO_Put(data);
+    for (size_t i = 0; i < 3; i++)
+    {
+        int data = rand() % 100;
+        printf("Producer %d: put %d\n", producer_id, data);
+        FIFO_Put(data);
+    }
     return NULL;
 }
 
 void *consumer(void *arg)
 {
     int consumer_id = (int)arg;
-    int data = FIFO_Get();
-    printf("Consumer %d: get %d\n", consumer_id, data);
+    while (1)
+    {
+        int data = FIFO_Get();
+        printf("Consumer %d: get %d\n", consumer_id, data);
+    }
     return NULL;
 }
 
@@ -132,8 +138,8 @@ int main(void)
     for (size_t i = 0; i < THREADS_COUNT; i++)
     {
         Pthread_join(producer_threads[i], NULL);
-        Pthread_join(consumer_threads[i], NULL);
     }
+    sleep(1); /* Wait for consumers to get all the data */
     FIFO_Destroy();
     return 0;
 }
