@@ -114,7 +114,7 @@ int main(void)
 {
     if (getuid() != 0)
     {
-        /* On MacOS `sem_open` creates a named semaphore, which needs root privileges to be deleted */
+        /* On MacOS `Sem_init` creates a named semaphore, which needs root privileges to be deleted */
         fprintf(stderr, "please run the program as root\n");
         exit(1);
     }
@@ -125,8 +125,8 @@ int main(void)
     pthread_t consumer_threads[THREADS_COUNT];
     for (size_t i = 0; i < THREADS_COUNT; i++)
     {
-        Pthread_create(&(producer_threads[i]), NULL, producer, (void *)i);
-        Pthread_create(&(consumer_threads[i]), NULL, consumer, (void *)i);
+        Pthread_create(producer_threads + i, NULL, producer, (void *)i);
+        Pthread_create(consumer_threads + i, NULL, consumer, (void *)i);
     }
 
     for (size_t i = 0; i < THREADS_COUNT; i++)
