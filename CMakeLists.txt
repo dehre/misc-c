@@ -46,3 +46,9 @@ target_include_directories(fifo-mpmc PRIVATE src/include)
 # 
 add_executable(fifo-spmc src/fifo-single-producer-multi-consumer/fifo-spmc.c)
 target_include_directories(fifo-spmc PRIVATE src/include)
+
+# 
+# Single-Producer Single-Consumer FIFO Queue
+# 
+add_executable(fifo-spsc src/fifo-single-producer-single-consumer/fifo-spsc.c)
+target_include_directories(fifo-spsc PRIVATE src/include)
