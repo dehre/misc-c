@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define THREADS_COUNT 16
+#define THREADS_COUNT 8
 
 //==================================================================================================
 // FIFO QUEUE
 //==================================================================================================
 
-#define FIFO_SIZE 4
+#define FIFO_SIZE 3
 int FIFO[FIFO_SIZE];
 int *PutPtr;
 int *GetPtr;
