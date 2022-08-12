@@ -40,6 +40,8 @@ Furthermore, [named semaphores](https://man7.org/linux/man-pages/man7/sem_overvi
 
 Overall, supporting both Linux and MacOS turned out to be a bit of an headache and required [some bits of preprocessor magic](https://github.com/dehre/misc-c/blob/main/src/include/common_threads.h).
 
+// TODO LORIS: make your own semaphores for MacOS based on mutex and condition variable.
+
 ## ASIDE: The astronaut...
 
 The [nice cartoon sketch](https://pixabay.com/illustrations/sketch-cartoon-space-set-3045125/) is offered by Pixabay users under their [generous free license](https://pixabay.com/service/license/).
