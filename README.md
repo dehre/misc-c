@@ -36,11 +36,9 @@ int sem_getvalue(sem_t * __restrict, int * __restrict) __deprecated;
 int sem_destroy(sem_t *) __deprecated;
 ```
 
-Furthermore, [named semaphores](https://man7.org/linux/man-pages/man7/sem_overview.7.html) (the only ones available on MacOS) exist beyond the end of the process and could potentially affect other processes that don't belong to you, so creating and deleting them requires root permissions, that is, running the executable with `sudo`.
+Furthermore, [named semaphores](https://man7.org/linux/man-pages/man7/sem_overview.7.html) (the only ones available on MacOS) exist beyond the end of the process and could potentially affect other processes that don't belong to you, so creating and deleting them would require root permissions, that is, running the executable with `sudo`.
 
-Overall, supporting both Linux and MacOS turned out to be a bit of an headache and required [some bits of preprocessor magic](https://github.com/dehre/misc-c/blob/main/src/include/common_threads.h).
-
-// TODO LORIS: make your own semaphores for MacOS based on mutex and condition variable.
+Luckily, a simple implementation of unnamed semaphores on top of mutexes and condition variables [turned out to be quite straightforward](https://github.com/dehre/misc-c/blob/main/libs/common_semaphores/macos.c).
 
 ## ASIDE: The astronaut...
 
