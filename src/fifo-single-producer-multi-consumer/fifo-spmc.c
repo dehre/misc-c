@@ -1,7 +1,7 @@
 #include "common.h"
+#include "common_semaphores.h"
 #include "common_threads.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 #define CONSUMER_THREADS_COUNT 3
@@ -16,7 +16,7 @@ int *PutPtr;
 int *GetPtr;
 
 pthread_mutex_t FIFOMutex;
-semaphore_t *FIFOCurrentSize;
+semaphore_t FIFOCurrentSize;
 
 typedef enum [[nodiscard]]
 {
@@ -28,12 +28,14 @@ void FIFO_Init(void)
 {
     PutPtr = GetPtr = &(FIFO[0]);
     Pthread_mutex_init(&FIFOMutex);
-    Sem_init(FIFOCurrentSize, 0);
+    Sem_init(&FIFOCurrentSize, 0);
 }
 
 FIFO_Rc FIFO_Put(int data)
 {
-    if (Sem_getvalue(FIFOCurrentSize) == FIFO_SIZE)
+    int current_size;
+    Sem_getvalue(&FIFOCurrentSize, &current_size);
+    if (current_size == FIFO_SIZE)
     {
         return FIFO_FAIL;
     }
@@ -45,13 +47,13 @@ FIFO_Rc FIFO_Put(int data)
         PutPtr = &(FIFO[0]);
     }
 
-    Sem_post(FIFOCurrentSize);
+    Sem_post(&FIFOCurrentSize);
     return FIFO_SUCCESS;
 }
 
 int FIFO_Get(void)
 {
-    Sem_wait(FIFOCurrentSize);
+    Sem_wait(&FIFOCurrentSize);
     Pthread_mutex_lock(&FIFOMutex);
 
     int data = *GetPtr;
@@ -68,7 +70,7 @@ int FIFO_Get(void)
 void FIFO_Destroy(void)
 {
     Pthread_mutex_destroy(&FIFOMutex);
-    Sem_destroy(FIFOCurrentSize);
+    Sem_destroy(&FIFOCurrentSize);
 }
 
 //==================================================================================================
@@ -122,15 +124,8 @@ void *consumer(void *arg)
 
 int main(void)
 {
-    if (getuid() != 0)
-    {
-        /* On MacOS `Sem_init` creates a named semaphore, which needs root privileges to be deleted */
-        fprintf(stderr, "please run the program as root\n");
-        exit(1);
-    }
-
-    FIFO_Init();
     Sranddev();
+    FIFO_Init();
     pthread_t producer_thread;
     pthread_t consumer_threads[CONSUMER_THREADS_COUNT];
     Pthread_create(&producer_thread, NULL, producer, NULL);

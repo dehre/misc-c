@@ -29,26 +29,27 @@ add_link_options(
 # Add `DEBUG` symbol when not in release mode
 add_compile_definitions($<$<NOT:$<CONFIG:RELEASE>>:DEBUG>)
 
-# 
-# Moore Finite State Machine
-# 
-add_executable(fst src/finite-state-machine/fst.c)
-# target_link_libraries(fst PUBLIC somelib)
+# # # # # # # # # # # # # # # # # # # # # 
+# LIBRARIES
+# # # # # # # # # # # # # # # # # # # # # 
 
-# 
-# Multi-Producer Multi-Consumer FIFO Queue
-# 
+add_library(common_semaphores libs/common_semaphores/macos.c)
+target_include_directories(common_semaphores PUBLIC ${PROJECT_SOURCE_DIR}/src/include)
+
+# # # # # # # # # # # # # # # # # # # # # 
+# EXECUTABLES
+# # # # # # # # # # # # # # # # # # # # # 
+
+add_executable(fst src/finite-state-machine/fst.c)
+
 add_executable(fifo-mpmc src/fifo-multi-producer-multi-consumer/fifo-mpmc.c)
 target_include_directories(fifo-mpmc PRIVATE src/include)
+target_link_libraries(fifo-mpmc PUBLIC common_semaphores)
 
-# 
-# Single-Producer Multi-Consumer FIFO Queue
-# 
 add_executable(fifo-spmc src/fifo-single-producer-multi-consumer/fifo-spmc.c)
 target_include_directories(fifo-spmc PRIVATE src/include)
+target_link_libraries(fifo-spmc PUBLIC common_semaphores)
 
-# 
-# Single-Producer Single-Consumer FIFO Queue
-# 
 add_executable(fifo-spsc src/fifo-single-producer-single-consumer/fifo-spsc.c)
 target_include_directories(fifo-spsc PRIVATE src/include)
+target_link_libraries(fifo-spsc PUBLIC common_semaphores)

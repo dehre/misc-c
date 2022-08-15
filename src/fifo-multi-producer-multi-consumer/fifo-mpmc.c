@@ -1,7 +1,7 @@
 #include "common.h"
+#include "common_semaphores.h"
 #include "common_threads.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 #define THREADS_COUNT 3
@@ -16,20 +16,20 @@ int *PutPtr;
 int *GetPtr;
 
 pthread_mutex_t FIFOMutex;
-semaphore_t *FIFOCurrentSize;
-semaphore_t *FIFORoomLeft;
+semaphore_t FIFOCurrentSize;
+semaphore_t FIFORoomLeft;
 
 void FIFO_Init(void)
 {
     PutPtr = GetPtr = &(FIFO[0]);
     Pthread_mutex_init(&FIFOMutex);
-    Sem_init(FIFOCurrentSize, 0);
-    Sem_init(FIFORoomLeft, FIFO_SIZE);
+    Sem_init(&FIFOCurrentSize, 0);
+    Sem_init(&FIFORoomLeft, FIFO_SIZE);
 }
 
 void FIFO_Put(int data)
 {
-    Sem_wait(FIFORoomLeft);
+    Sem_wait(&FIFORoomLeft);
     Pthread_mutex_lock(&FIFOMutex);
 
     *PutPtr = data;
@@ -40,12 +40,12 @@ void FIFO_Put(int data)
     }
 
     Pthread_mutex_unlock(&FIFOMutex);
-    Sem_post(FIFOCurrentSize);
+    Sem_post(&FIFOCurrentSize);
 }
 
 int FIFO_Get(void)
 {
-    Sem_wait(FIFOCurrentSize);
+    Sem_wait(&FIFOCurrentSize);
     Pthread_mutex_lock(&FIFOMutex);
 
     int data = *GetPtr;
@@ -56,15 +56,15 @@ int FIFO_Get(void)
     }
 
     Pthread_mutex_unlock(&FIFOMutex);
-    Sem_post(FIFORoomLeft);
+    Sem_post(&FIFORoomLeft);
     return data;
 }
 
 void FIFO_Destroy(void)
 {
     Pthread_mutex_destroy(&FIFOMutex);
-    Sem_destroy(FIFOCurrentSize);
-    Sem_destroy(FIFORoomLeft);
+    Sem_destroy(&FIFOCurrentSize);
+    Sem_destroy(&FIFORoomLeft);
 }
 
 //==================================================================================================
@@ -118,15 +118,8 @@ void *consumer(void *arg)
 
 int main(void)
 {
-    if (getuid() != 0)
-    {
-        /* On MacOS `Sem_init` creates a named semaphore, which needs root privileges to be deleted */
-        fprintf(stderr, "please run the program as root\n");
-        exit(1);
-    }
-
-    FIFO_Init();
     Sranddev();
+    FIFO_Init();
     pthread_t producer_threads[THREADS_COUNT];
     pthread_t consumer_threads[THREADS_COUNT];
     for (size_t i = 0; i < THREADS_COUNT; i++)
